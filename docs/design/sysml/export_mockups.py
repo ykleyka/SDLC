@@ -3,8 +3,9 @@
 
 Скрипт собирает ноутбук из EvenUp-mockups.sysml (ячейка с моделью и по ячейке
 %viz на каждую диаграмму из VIEWS), выполняет его через `jupyter nbconvert`,
-достаёт SVG из результатов и конвертирует их в PNG в каталог srs/images/.
-Каркасы экранов рисует отдельный скрипт render_wireframes.py.
+достаёт SVG из результатов и конвертирует их в PNG в каталог images/.
+Наброски экранов — вид Interconnection со стилем LR (элементы сверху вниз),
+навигация — вид State.
 
 Запуск (WSL, в conda-окружении с jupyter-sysml-kernel):
     python3 export_mockups.py
@@ -23,9 +24,18 @@ HERE = Path(__file__).resolve().parent
 MODEL = HERE / "EvenUp-mockups.sysml"
 NOTEBOOK = HERE / "EvenUp-mockups.ipynb"
 OUT_DIR = HERE.parent / "images"
-# (имя PNG, элемент модели, вид %viz)
+# (имя PNG, элемент модели, параметры %viz)
+SCREEN = "--view=Interconnection --style=LR"
 VIEWS = [
-    ("ui-00-navigation", "EvenUpMockups::Navigation::AppNavigation", "State"),
+    ("ui-00-navigation", "EvenUpMockups::Navigation::AppNavigation", "--view=State"),
+    ("ui-01-login", "EvenUpMockups::Screens::loginScreen", SCREEN),
+    ("ui-02-groups", "EvenUpMockups::Screens::groupsScreen", SCREEN),
+    ("ui-03-expenses", "EvenUpMockups::Screens::expensesScreen", SCREEN),
+    ("ui-04-expense-form", "EvenUpMockups::Screens::expenseFormScreen", SCREEN),
+    ("ui-05-balances", "EvenUpMockups::Screens::balancesScreen", SCREEN),
+    ("ui-06-members", "EvenUpMockups::Screens::membersScreen", SCREEN),
+    ("ui-07-history", "EvenUpMockups::Screens::historyScreen", SCREEN),
+    ("ui-08-join", "EvenUpMockups::Screens::joinScreen", SCREEN),
 ]
 
 
@@ -35,7 +45,7 @@ def code_cell(source):
 
 def build_notebook(kernel):
     cells = [code_cell(MODEL.read_text(encoding="utf-8"))]
-    cells += [code_cell(f"%viz --view={view} {element}") for _, element, view in VIEWS]
+    cells += [code_cell(f"%viz {options} {element}") for _, element, options in VIEWS]
     return {
         "nbformat": 4,
         "nbformat_minor": 4,

@@ -1,59 +1,30 @@
 package EvenUpMockups {
-    doc /* Мокапы пользовательского интерфейса веб-приложения EvenUp (SRS v0.1, раздел 3.1.1).
+    doc /* Наброски (low-fidelity мокапы) интерфейса веб-приложения EvenUp (SRS v0.1, раздел 3.1.1).
          * Экран — part-usage типа Screen, вложенные части — элементы интерфейса.
-         * Порядок вложенных частей задаёт порядок отображения: сверху вниз,
-         * или слева направо, если у контейнера layout = "row". */
+         * Имя части — текст, который видит пользователь, тип — вид элемента.
+         * Порядок частей задаёт порядок элементов на экране сверху вниз
+         * (при отрисовке вложенные контейнеры идут перед одиночными элементами,
+         * поэтому одиночные элементы в начале экрана объединены в панели).
+         * Обозначения: [Вкладка] — выбранная вкладка, [x] / [ ] — флажок, (o) / ( ) — переключатель. */
 
     // ================================================================
-    // Библиотека элементов интерфейса
+    // Виды элементов интерфейса
     // ================================================================
     package UI {
-        private import ScalarValues::*;
-
-        abstract part def Widget {
-            attribute label : String default "";
-            attribute style : String default "normal";   // normal | heading | muted | positive | negative | error | primary | danger
-            attribute enabled : Boolean default true;
-        }
-
-        abstract part def Container :> Widget {
-            attribute layout : String default "column";  // column | row
-        }
-
-        part def Screen :> Container {
-            attribute route : String;                     // адрес страницы
-            attribute currentUser : String default "";    // кто вошёл в систему (пусто — гость)
-        }
-        part def Panel :> Container;
-        part def TabBar :> Container;
-        part def ListView :> Container;
-
-        part def Label :> Widget;
-        part def Button :> Widget;
-        part def Link :> Widget;
-
-        part def TextField :> Widget {
-            attribute value : String default "";
-            attribute placeholder : String default "";
-            attribute readOnly : Boolean default false;
-        }
-        part def PasswordField :> TextField;
-        part def DateField :> TextField;
-        part def ComboBox :> TextField;
-
-        part def CheckBox :> Widget {
-            attribute checked : Boolean default false;
-        }
-        part def RadioButton :> CheckBox;
-
-        part def Tab :> Widget {
-            attribute selected : Boolean default false;
-        }
-
-        part def ListItem :> Widget {
-            attribute value : String default "";
-            attribute details : String default "";
-        }
+        part def Screen;     // экран (страница)
+        part def AppBar;     // верхняя панель приложения
+        part def Panel;      // группа элементов
+        part def Tabs;       // панель вкладок
+        part def Tab;        // вкладка
+        part def List;       // список
+        part def Item;       // строка списка
+        part def Text;       // надпись
+        part def Field;      // поле ввода
+        part def Select;     // выпадающий список
+        part def CheckBox;   // флажок
+        part def Radio;      // переключатель
+        part def Button;     // кнопка
+        part def Link;       // ссылка
     }
 
     // ================================================================
@@ -62,280 +33,149 @@ package EvenUpMockups {
     package Screens {
         private import EvenUpMockups::UI::*;
 
-        // ---------- UI-01. Вход / регистрация (REQ-FUNC-001, 002) ----------
-        part loginScreen : Screen {
-            :>> label = "Вход";
-            :>> route = "/login";
+        // UI-01. Вход / регистрация (REQ-FUNC-001, 002), маршрут /login
+        part <loginScreen> 'UI-01. Вход' : Screen {
+            part 'Вход или регистрация' : Tabs {
+                part '[Вход]' : Tab;
+                part 'Регистрация' : Tab;
+            }
+            part 'Email: name@example.com' : Field;
+            part 'Пароль: не менее 8 символов' : Field;
+            part 'Неверный email или пароль' : Text;
+            part 'Войти' : Button;
+            part 'Нет аккаунта? Зарегистрироваться' : Link;
+        }
 
-            part authTabs : TabBar {
-                :>> layout = "row";
-                part tabLogin : Tab { :>> label = "Вход"; :>> selected = true; }
-                part tabRegister : Tab { :>> label = "Регистрация"; }
+        // UI-02. Мои группы (REQ-FUNC-003, 004, 005), маршрут /groups
+        part <groupsScreen> 'UI-02. Мои группы' : Screen {
+            part 'EvenUp · Аня' : AppBar {
+                part '+ Создать группу' : Button;
             }
-            part emailField : TextField {
-                :>> label = "Email";
-                :>> placeholder = "name@example.com";
+            part 'Группы' : List {
+                part 'Поездка в Минск · 3 уч. · +50,00 BYN' : Item;
+                part 'Квартира · 4 уч. · −12,40 BYN' : Item;
+                part 'День рождения Бориса · 6 уч. · 0,00 BYN' : Item;
             }
-            part passwordField : PasswordField {
-                :>> label = "Пароль";
-                :>> placeholder = "Не менее 8 символов";
+            part 'Архив (2) — показать' : Link;
+        }
+
+        // UI-03. Группа → Траты (REQ-FUNC-011, 019, 020), маршрут /groups/{id}/expenses
+        part <expensesScreen> 'UI-03. Группа: траты' : Screen {
+            part '← Мои группы · Поездка в Минск' : Tabs {
+                part '[Траты]' : Tab;
+                part 'Балансы' : Tab;
+                part 'Участники' : Tab;
+                part 'История' : Tab;
             }
-            part errorMessage : Label {
-                :>> label = "Неверный email или пароль";
-                :>> style = "error";
+            part 'Действия' : Panel {
+                part 'Участник: Все' : Select;
+                part '+ Добавить трату' : Button;
             }
-            part loginButton : Button {
-                :>> label = "Войти";
-                :>> style = "primary";
-            }
-            part registerLink : Link {
-                :>> label = "Нет аккаунта? Зарегистрироваться";
+            part 'Траты' : List {
+                part 'Ужин · 30,00 BYN · платил Борис, 13.10' : Item;
+                part 'Жильё · 90,00 BYN · платила Аня, 12.10' : Item;
             }
         }
 
-        // ---------- UI-02. Мои группы (REQ-FUNC-003, 004) ----------
-        part groupsScreen : Screen {
-            :>> label = "Мои группы";
-            :>> route = "/groups";
-            :>> currentUser = "Аня";
+        // UI-04. Форма траты (REQ-FUNC-011, 012, 013), маршрут /groups/{id}/expenses/new
+        part <expenseFormScreen> 'UI-04. Новая трата' : Screen {
+            part 'Трата' : Panel {
+                part 'Описание: Ужин' : Field;
+                part 'Сумма, BYN: 30,00' : Field;
+                part 'Дата: 13.10.2026' : Field;
+                part 'Кто платил: Борис' : Select;
+            }
+            part 'Делить поровну между' : Panel {
+                part '[x] Аня' : CheckBox;
+                part '[x] Борис' : CheckBox;
+                part '[x] Вика (без аккаунта)' : CheckBox;
+                part 'По 10,00 BYN на каждого' : Text;
+            }
+            part 'Отмена' : Button;
+            part 'Сохранить' : Button;
+        }
 
-            part header : Panel {
-                :>> layout = "row";
-                part title : Label { :>> label = "Мои группы"; :>> style = "heading"; }
-                part createGroupButton : Button { :>> label = "+ Создать группу"; :>> style = "primary"; }
+        // UI-05. Группа → Балансы (REQ-FUNC-014, 015, 016), маршрут /groups/{id}/balances
+        part <balancesScreen> 'UI-05. Группа: балансы' : Screen {
+            part '← Мои группы · Поездка в Минск' : Tabs {
+                part 'Траты' : Tab;
+                part '[Балансы]' : Tab;
+                part 'Участники' : Tab;
+                part 'История' : Tab;
             }
-            part groupList : ListView {
-                part groupTrip : ListItem {
-                    :>> label = "Поездка в Минск";
-                    :>> details = "3 участника";
-                    :>> value = "+50,00 BYN";
-                    :>> style = "positive";
+            part 'Балансы участников' : List {
+                part 'Аня: +50,00 BYN' : Item;
+                part 'Борис: −10,00 BYN' : Item;
+                part 'Вика: −40,00 BYN' : Item;
+            }
+            part 'Кто кому переводит' : List {
+                part 'Вика → Аня: 40,00 BYN' : Item {
+                    part 'Отметить выполненным' : Button;
                 }
-                part groupFlat : ListItem {
-                    :>> label = "Квартира";
-                    :>> details = "4 участника";
-                    :>> value = "−12,40 BYN";
-                    :>> style = "negative";
-                }
-                part groupBirthday : ListItem {
-                    :>> label = "День рождения Бориса";
-                    :>> details = "6 участников";
-                    :>> value = "0,00 BYN";
+                part 'Борис → Аня: 10,00 BYN' : Item {
+                    part 'Отметить выполненным' : Button;
                 }
             }
-            part archiveSection : Link {
-                :>> label = "Архив (2) — показать";
+            part 'Записать перевод вручную' : Button;
+        }
+
+        // UI-06. Группа → Участники (REQ-FUNC-006, 008, 010, 021), маршрут /groups/{id}/members
+        part <membersScreen> 'UI-06. Группа: участники' : Screen {
+            part '← Мои группы · Поездка в Минск' : Tabs {
+                part 'Траты' : Tab;
+                part 'Балансы' : Tab;
+                part '[Участники]' : Tab;
+                part 'История' : Tab;
+            }
+            part 'Участники (3 из 30)' : List {
+                part 'Аня' : Item {
+                    part 'Создатель группы' : Text;
+                }
+                part 'Борис' : Item {
+                    part 'Удалить' : Button;
+                }
+                part 'Вика · без аккаунта · баланс не 0' : Item {
+                    part 'Удалить (недоступно)' : Button;
+                }
+            }
+            part 'Ссылка-приглашение' : Panel {
+                part 'evenup.local/join/7f3a…' : Field;
+                part 'Скопировать' : Button;
+                part 'Перевыпустить' : Button;
+            }
+            part 'Участник без аккаунта' : Panel {
+                part 'Имя' : Field;
+                part 'Добавить' : Button;
             }
         }
 
-        // ---------- UI-03. Группа → Траты (REQ-FUNC-011, 019, 020) ----------
-        part expensesScreen : Screen {
-            :>> label = "Поездка в Минск — Траты";
-            :>> route = "/groups/{id}/expenses";
-            :>> currentUser = "Аня";
-
-            part backLink : Link { :>> label = "← Мои группы"; }
-            part groupTitle : Label { :>> label = "Поездка в Минск"; :>> style = "heading"; }
-            part groupTabs : TabBar {
-                :>> layout = "row";
-                part tabExpenses : Tab { :>> label = "Траты"; :>> selected = true; }
-                part tabBalances : Tab { :>> label = "Балансы"; }
-                part tabMembers : Tab { :>> label = "Участники"; }
-                part tabHistory : Tab { :>> label = "История"; }
+        // UI-07. Группа → История (REQ-FUNC-018), маршрут /groups/{id}/history
+        part <historyScreen> 'UI-07. Группа: история' : Screen {
+            part '← Мои группы · Поездка в Минск' : Tabs {
+                part 'Траты' : Tab;
+                part 'Балансы' : Tab;
+                part 'Участники' : Tab;
+                part '[История]' : Tab;
             }
-            part toolbar : Panel {
-                :>> layout = "row";
-                part memberFilter : ComboBox { :>> label = "Участник"; :>> value = "Все"; }
-                part addExpenseButton : Button { :>> label = "+ Добавить трату"; :>> style = "primary"; }
-            }
-            part expenseList : ListView {
-                part expenseDinner : ListItem {
-                    :>> label = "Ужин";
-                    :>> details = "Платил Борис · 13.10.2026 · на 3 чел.";
-                    :>> value = "30,00 BYN";
-                }
-                part expenseFlat : ListItem {
-                    :>> label = "Жильё";
-                    :>> details = "Платила Аня · 12.10.2026 · на 3 чел.";
-                    :>> value = "90,00 BYN";
-                }
+            part 'Лента операций' : List {
+                part '13.10 21:40 · Борис добавил трату «Ужин», 30,00 BYN' : Item;
+                part '12.10 15:05 · Аня добавила трату «Жильё», 90,00 BYN' : Item;
+                part '12.10 15:01 · Аня добавила участника Вика' : Item;
+                part '12.10 14:58 · Борис вступил в группу' : Item;
             }
         }
 
-        // ---------- UI-04. Форма траты (REQ-FUNC-011, 012, 013) ----------
-        part expenseFormScreen : Screen {
-            :>> label = "Новая трата";
-            :>> route = "/groups/{id}/expenses/new";
-            :>> currentUser = "Аня";
-
-            part descriptionField : TextField { :>> label = "Описание"; :>> value = "Ужин"; }
-            part amountRow : Panel {
-                :>> layout = "row";
-                part amountField : TextField { :>> label = "Сумма, BYN"; :>> value = "30,00"; }
-                part dateField : DateField { :>> label = "Дата"; :>> value = "13.10.2026"; }
+        // UI-08. Вступление в группу (REQ-FUNC-007, 009), маршрут /join/{token}
+        part <joinScreen> 'UI-08. Приглашение в группу' : Screen {
+            part 'Вас пригласили в группу «Поездка в Минск»' : Panel {
+                part 'Создатель: Аня · 3 участника · BYN' : Text;
             }
-            part payerField : ComboBox { :>> label = "Кто платил"; :>> value = "Борис"; }
-            part splitPanel : Panel {
-                :>> label = "Делить поровну между";
-                part splitAnya : CheckBox { :>> label = "Аня"; :>> checked = true; }
-                part splitBoris : CheckBox { :>> label = "Борис"; :>> checked = true; }
-                part splitVika : CheckBox { :>> label = "Вика (без аккаунта)"; :>> checked = true; }
-                part shareHint : Label { :>> label = "По 10,00 BYN на каждого"; :>> style = "muted"; }
+            part 'Кто вы в этой группе?' : Panel {
+                part '( ) Я новый участник' : Radio;
+                part '(o) Я — Вика (без аккаунта)' : Radio;
             }
-            part formButtons : Panel {
-                :>> layout = "row";
-                part cancelButton : Button { :>> label = "Отмена"; }
-                part saveButton : Button { :>> label = "Сохранить"; :>> style = "primary"; }
-            }
-        }
-
-        // ---------- UI-05. Группа → Балансы (REQ-FUNC-014, 015, 016) ----------
-        part balancesScreen : Screen {
-            :>> label = "Поездка в Минск — Балансы";
-            :>> route = "/groups/{id}/balances";
-            :>> currentUser = "Аня";
-
-            part backLink : Link { :>> label = "← Мои группы"; }
-            part groupTitle : Label { :>> label = "Поездка в Минск"; :>> style = "heading"; }
-            part groupTabs : TabBar {
-                :>> layout = "row";
-                part tabExpenses : Tab { :>> label = "Траты"; }
-                part tabBalances : Tab { :>> label = "Балансы"; :>> selected = true; }
-                part tabMembers : Tab { :>> label = "Участники"; }
-                part tabHistory : Tab { :>> label = "История"; }
-            }
-            part balanceList : ListView {
-                :>> label = "Балансы участников";
-                part balanceAnya : ListItem { :>> label = "Аня"; :>> value = "+50,00 BYN"; :>> style = "positive"; }
-                part balanceBoris : ListItem { :>> label = "Борис"; :>> value = "−10,00 BYN"; :>> style = "negative"; }
-                part balanceVika : ListItem { :>> label = "Вика"; :>> value = "−40,00 BYN"; :>> style = "negative"; }
-            }
-            part transferList : Panel {
-                :>> label = "Кто кому переводит";
-                part transfer1 : Panel {
-                    :>> layout = "row";
-                    part transfer1Text : Label { :>> label = "Вика → Аня: 40,00 BYN"; }
-                    part transfer1Done : Button { :>> label = "Отметить выполненным"; }
-                }
-                part transfer2 : Panel {
-                    :>> layout = "row";
-                    part transfer2Text : Label { :>> label = "Борис → Аня: 10,00 BYN"; }
-                    part transfer2Done : Button { :>> label = "Отметить выполненным"; }
-                }
-            }
-            part manualSettlementButton : Button {
-                :>> label = "Записать перевод вручную";
-            }
-        }
-
-        // ---------- UI-06. Группа → Участники (REQ-FUNC-006, 008, 010) ----------
-        part membersScreen : Screen {
-            :>> label = "Поездка в Минск — Участники";
-            :>> route = "/groups/{id}/members";
-            :>> currentUser = "Аня";
-
-            part backLink : Link { :>> label = "← Мои группы"; }
-            part groupTitle : Label { :>> label = "Поездка в Минск"; :>> style = "heading"; }
-            part groupTabs : TabBar {
-                :>> layout = "row";
-                part tabExpenses : Tab { :>> label = "Траты"; }
-                part tabBalances : Tab { :>> label = "Балансы"; }
-                part tabMembers : Tab { :>> label = "Участники"; :>> selected = true; }
-                part tabHistory : Tab { :>> label = "История"; }
-            }
-            part memberList : ListView {
-                :>> label = "Участники (3 из 30)";
-                part memberAnya : ListItem { :>> label = "Аня"; :>> details = "Создатель группы"; }
-                part memberBoris : ListItem { :>> label = "Борис"; :>> value = "Удалить"; }
-                part memberVika : ListItem {
-                    :>> label = "Вика";
-                    :>> details = "Без аккаунта · баланс не нулевой — удалить нельзя";
-                    :>> value = "Удалить";
-                    :>> enabled = false;
-                }
-            }
-            part invitePanel : Panel {
-                :>> label = "Ссылка-приглашение";
-                part inviteLink : TextField {
-                    :>> value = "https://evenup.local/join/7f3a…";
-                    :>> readOnly = true;
-                }
-                part inviteButtons : Panel {
-                    :>> layout = "row";
-                    part copyButton : Button { :>> label = "Скопировать"; :>> style = "primary"; }
-                    part regenerateButton : Button { :>> label = "Перевыпустить"; }
-                }
-            }
-            part addVirtualPanel : Panel {
-                :>> label = "Добавить участника без аккаунта";
-                :>> layout = "row";
-                part virtualNameField : TextField { :>> placeholder = "Имя"; }
-                part addVirtualButton : Button { :>> label = "Добавить"; }
-            }
-        }
-
-        // ---------- UI-07. Группа → История (REQ-FUNC-018) ----------
-        part historyScreen : Screen {
-            :>> label = "Поездка в Минск — История";
-            :>> route = "/groups/{id}/history";
-            :>> currentUser = "Аня";
-
-            part backLink : Link { :>> label = "← Мои группы"; }
-            part groupTitle : Label { :>> label = "Поездка в Минск"; :>> style = "heading"; }
-            part groupTabs : TabBar {
-                :>> layout = "row";
-                part tabExpenses : Tab { :>> label = "Траты"; }
-                part tabBalances : Tab { :>> label = "Балансы"; }
-                part tabMembers : Tab { :>> label = "Участники"; }
-                part tabHistory : Tab { :>> label = "История"; :>> selected = true; }
-            }
-            part historyList : ListView {
-                part event4 : ListItem {
-                    :>> label = "Борис добавил трату «Ужин» — 30,00 BYN";
-                    :>> details = "13.10.2026 21:40";
-                }
-                part event3 : ListItem {
-                    :>> label = "Аня добавила трату «Жильё» — 90,00 BYN";
-                    :>> details = "12.10.2026 15:05";
-                }
-                part event2 : ListItem {
-                    :>> label = "Аня добавила участника Вика (без аккаунта)";
-                    :>> details = "12.10.2026 15:01";
-                }
-                part event1 : ListItem {
-                    :>> label = "Борис вступил в группу";
-                    :>> details = "12.10.2026 14:58";
-                }
-            }
-        }
-
-        // ---------- UI-08. Вступление в группу (REQ-FUNC-007, 009) ----------
-        part joinScreen : Screen {
-            :>> label = "Приглашение в группу";
-            :>> route = "/join/{token}";
-            :>> currentUser = "Вика";
-
-            part inviteTitle : Label {
-                :>> label = "Вас пригласили в группу «Поездка в Минск»";
-                :>> style = "heading";
-            }
-            part inviteInfo : Label {
-                :>> label = "Создатель: Аня · 3 участника · валюта BYN";
-                :>> style = "muted";
-            }
-            part identityPanel : Panel {
-                :>> label = "Кто вы в этой группе?";
-                part newMemberOption : RadioButton { :>> label = "Я новый участник"; }
-                part claimVikaOption : RadioButton {
-                    :>> label = "Я — Вика (участник без аккаунта)";
-                    :>> checked = true;
-                }
-            }
-            part joinButtons : Panel {
-                :>> layout = "row";
-                part declineButton : Button { :>> label = "Отказаться"; }
-                part joinButton : Button { :>> label = "Вступить"; :>> style = "primary"; }
-            }
+            part 'Отказаться' : Button;
+            part 'Вступить' : Button;
         }
     }
 
