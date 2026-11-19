@@ -1,2 +1,9 @@
-src/bin/
-src/obj/
+**/bin/
+**/obj/
+**/logs/
+*.db
+*.db-shm
+*.db-wal
+# Python
+__pycache__/
+*.pyc
