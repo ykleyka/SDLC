@@ -2,13 +2,13 @@
 
 Для веб-приложения «EvenUp» — учёт совместных расходов
 
-Версия 0.1
+Версия 0.2
 
 Подготовил(а) Чалей В. В.
 
 БГУИР, кафедра ЭВМ
 
-04.11.2026
+19.11.2026
 
 ## Оглавление
 
@@ -25,6 +25,7 @@
 * [3. Проектные представления](#3-design-views)
   * [3.1 Системные требования](#31-system-requirements)
   * [3.2 Приоритеты функционала](#32-feature-priorities)
+    * [3.2.1 Оценки и план итераций](#321-estimates-and-iteration-plan)
   * [3.3 Представления дизайна](#33-views)
 * [4. Решения](#4-decisions)
 * [5. Приложения](#5-appendixes)
@@ -35,7 +36,8 @@
 | Name | Date | Reason For Changes | Version |
 |------|------|--------------------|---------|
 | Чалей В. В. | 04.11.2026 | Первоначальная версия на основе SRS v0.1 | 0.1 |
-|      |      |                    |         |
+| Чалей В. В. | 16.11.2026 | Оценки функций в часах и три версии плана итераций по итогам обсуждения с Заказчиком; F-10, F-14 и F-15 перенесены в релиз 2.0, добавлена F-16 «Регулярные траты» (SRS v0.3) | 0.2 |
+| Чалей В. В. | 19.11.2026 | Сокращены проектные представления, обновлена трассировка и согласован план с junior-разработчиком | 0.2 |
 
 ---
 
@@ -45,15 +47,15 @@
 
 ### 1.1 Назначение документа {#11-document-purpose}
 
-SDD служит руководством для разработчиков при реализации релиза 1.0 и для сопровождающего при последующих изменениях. Документ также используется Заказчиком для согласования приоритетов функционала и плана реализации. Он опирается на [SRS v0.1](srs.md), а принятые решения подробно описаны в протоколах [ADR](adr/).
+SDD служит руководством для разработчиков при реализации релиза 1.0 и для сопровождающего при последующих изменениях. Документ также используется Заказчиком для согласования приоритетов функционала и плана реализации. Текущая база требований — [SRS v0.3](srs.md), решения описаны в протоколах [ADR](adr/).
 
 ### 1.2 Область применения {#12-subject-scope}
 
-Документ охватывает «EvenUp» версии 1.0 (MVP) целиком: веб-интерфейс на Blazor, серверную бизнес-логику, базу данных SQLite и библиотеку расчётов. Система позволяет пользователям объединяться в группы, вести список совместных трат, видеть балансы и минимальный список переводов для закрытия долгов (бизнес-цели BG-1…BG-3 из SRS).
+Документ описывает релиз 1.0: веб-интерфейс на Blazor, серверную бизнес-логику, SQLite и библиотеку расчётов. Система позволяет вести совместные траты и балансы, а также показывает план переводов, который закрывает долги не более чем за N − 1 переводов. Выбранный жадный алгоритм не гарантирует математически абсолютный минимум переводов.
 
-**Входит:** все требования REQ-FUNC-001…021 и нефункциональные требования раздела 3.3–3.5 SRS.
+**Входит:** требования релиза 1.0 из SRS и функции F-00…F-09, F-11…F-13, F-16 из раздела 3.2.
 
-**Не входит:** функции релиза 2.0 (деление по долям, категории трат, экспорт в CSV), а также реальные платежи, уведомления и мобильные приложения.
+**Не входит в релиз 1.0:** детали траты (F-10), привязка виртуального участника (F-14) и фильтр трат (F-15) — перенесены в релиз 2.0 по согласованию с Заказчиком; экспорт истории в CSV, деление по долям и категории трат (отложены в SRS до релиза 2.0); реальные платежи, уведомления и нативные мобильные приложения.
 
 ### 1.3 Определения, акронимы и сокращения {#13-definitions-acronyms-and-abbreviations}
 
@@ -79,17 +81,17 @@ SDD служит руководством для разработчиков пр
 
 | Документ | Владелец | Версия / дата | Расположение | Статус |
 |----------|----------|---------------|--------------|--------|
-| SRS «EvenUp» | Чалей В. В. | 0.1 / 19.10.2026 | `docs/design/srs.md` | Нормативная |
+| SRS «EvenUp» | Чалей В. В. | 0.3 / 16.11.2026 | `docs/design/srs.md` | Нормативная |
 | Протоколы архитектурных решений | Чалей В. В. | 04.11.2026 | `docs/design/adr/` | Нормативная |
 | Лабораторная работа №4 «Разработка и документирование системных требований» | Кафедра, дисциплина ЖЦРПО | 2026 | Выдаётся преподавателем | Нормативная |
-| Шаблоны SDD и ADR | Кафедра, дисциплина ЖЦРПО | — | `Templates/sdd/`, `Templates/adr/` | Нормативная |
+| Шаблоны SDD и ADR | Кафедра, дисциплина ЖЦРПО | — | Выдаются преподавателем | Нормативная |
 | Мокапы интерфейса (SysMLv2) | Чалей В. В. | 0.1 | `docs/design/sysml/`, `docs/design/images/` | Справочная |
 | Документация ASP.NET Core Blazor | Microsoft | .NET 10 | https://learn.microsoft.com/aspnet/core/blazor | Справочная |
 | Документация EF Core | Microsoft | 10.0 | https://learn.microsoft.com/ef/core | Справочная |
 
 ### 1.5 Обзор документа {#15-document-overview}
 
-Раздел 2 перечисляет стейкхолдеров и выбранные точки зрения. Раздел 3 содержит системные требования с приоритетами (3.1–3.2) и проектные представления с ID вида `NNN-название` (3.3). Раздел 4 кратко перечисляет архитектурные решения, полные записи лежат в `adr/`. Диаграммы записаны в Mermaid и отображаются прямо на GitHub. При изменении документа добавляется строка в «Историю изменений», а изменённые системные требования получают суффикс версии (`SYS-FUNC-005-2`), как и в SRS.
+Раздел 2 описывает стейкхолдеров и выбранные точки зрения. Раздел 3 содержит системные требования, приоритеты и планы итераций, а также три представления, необходимые для их реализации: состав системы, модель данных и ключевые алгоритмы. Раздел 4 перечисляет архитектурные решения; полные записи находятся в `adr/`. При изменении документа добавляется строка в «Историю изменений», а изменённые системные требования получают суффикс версии (`SYS-FUNC-005-2`), как и в SRS.
 
 ---
 
@@ -101,33 +103,21 @@ SDD служит руководством для разработчиков пр
 
 | Стейкхолдер | Основные задачи | Где адресуется |
 |-------------|-----------------|----------------|
-| Пользователь (участник группы) | Правильные балансы, быстрый отклик, работа с телефона | 007-algorithms, 012-resources, SRS UI |
-| Заказчик | Состав функций, сроки, стоимость | 3.1, 3.2, раздел 4 |
-| Разработчик | Понятная структура кода, простота тестирования, минимум инфраструктуры | 002-composition, 003-logical, 005-interfaces, 010-patterns |
+| Пользователь (участник группы) | Правильные балансы, быстрый отклик, работа с телефона | 007-algorithms, SRS UI |
+| Заказчик (партнёр по проекту) | Согласование состава функций и учебного графика | 3.1, 3.2, SRS |
+| Разработчик (автор, один студент) | Разделение ответственности, целостность данных, ключевые расчёты и соблюдение учебных сроков | 002-composition, 004-information, 007-algorithms |
 | Тестировщик | Трассировка требований в код и тесты | 3.1, Приложение А |
-| Сопровождающий / преподаватель | Простая установка и запуск, отсутствие внешних сервисов | 011-deployment, ADR-0002 |
+| Сопровождающий / преподаватель | Простая установка и запуск, отсутствие внешних сервисов | 002-composition, ADR-0002 |
 
 ### 2.2 Выбранные точки зрения {#22-selected-viewpoints}
 
-Из 15 точек зрения шаблона выбраны те, которые важны для небольшого монолитного веб-приложения. Остальные не используются по причинам, указанным в таблице.
+Из 15 точек зрения шаблона выбраны те, которые непосредственно поддерживают системные требования и план реализации.
 
 | Точка зрения | Используется | Представление | Язык |
 |--------------|:-----------:|---------------|------|
-| Контекст | ✔ | 001-context | Диаграмма вариантов использования (Mermaid flowchart) |
-| Композиция | ✔ | 002-composition | Диаграмма компонентов |
-| Логическое представление | ✔ | 003-logical | Диаграмма классов UML |
-| Физическое представление | — | Совмещено с 011-deployment: один сервер, специального оборудования нет | — |
-| Структура | — | Внутренняя структура компонентов простая и покрыта 002 и 003 | — |
-| Зависимости | ✔ | 002-composition (направленные зависимости проектов) | Граф зависимостей |
+| Композиция и зависимости | ✔ | 002-composition | Диаграмма компонентов и таблица ответственности |
 | Информация | ✔ | 004-information | ER-диаграмма |
-| Интерфейс | ✔ | 005-interfaces | Сигнатуры методов C# |
-| Взаимодействие | ✔ | 006-interactions | Диаграммы последовательности UML |
-| Алгоритм | ✔ | 007-algorithms | Псевдокод |
-| Динамика состояний | ✔ | 008-states | Диаграмма состояний UML |
-| Параллелизм | ✔ | 009-concurrency | Описание + таблица |
-| Паттерны | ✔ | 010-patterns | Таблица паттернов |
-| Развёртывание | ✔ | 011-deployment | Диаграмма развёртывания |
-| Ресурсы | ✔ | 012-resources | Таблица оценки ресурсов |
+| Алгоритм | ✔ | 007-algorithms | Псевдокод ключевых расчётов |
 
 ---
 
@@ -135,13 +125,13 @@ SDD служит руководством для разработчиков пр
 
 ### 3.1 Системные требования {#31-system-requirements}
 
-Системные требования получены из требований SRS и описывают, что должна обеспечить каждая часть системы. Формат ID: `SYS-[AREA]-[NNN]`. Колонка «Компонент» ссылается на представление 002-composition, колонка «Приоритет» — на функцию из раздела 3.2.
+Системные требования получены из требований SRS и описывают, что должна обеспечить каждая часть системы. Формат ID: `SYS-[AREA]-[NNN]`. Колонка «Компонент» ссылается на представление 002-composition, колонка «Функция» — на функцию из раздела 3.2 (там же её приоритет и релиз).
 
 #### 3.1.1 Функциональные системные требования
 
 | ID | Требование | Из SRS | Компонент | Функция |
 |----|------------|--------|-----------|---------|
-| SYS-FUNC-001 | Система должна регистрировать пользователя через ASP.NET Core Identity, сохраняя email, отображаемое имя и хэш пароля, и сразу выполнять вход (cookie-аутентификация) | REQ-FUNC-001, REQ-SEC-001, REQ-SEC-007 | EvenUp.Web (Identity) | F-01 |
+| SYS-FUNC-001 | Система должна регистрировать пользователя через ASP.NET Core Identity, после подтверждения согласия сохранять email, отображаемое имя и хэш пароля и сразу выполнять вход | REQ-FUNC-001, REQ-SEC-001, REQ-SEC-007, REQ-COMP-002 | EvenUp.Web (Identity) | F-01 |
 | SYS-FUNC-002 | Система должна выполнять вход по email и паролю, блокировать аккаунт на 5 минут после 5 неудачных попыток и перенаправлять неавторизованные запросы к защищённым страницам на `/login` | REQ-FUNC-002, REQ-SEC-006 | EvenUp.Web (Identity) | F-01 |
 | SYS-FUNC-003 | `GroupService` должен создавать группу с названием и валютой, добавляя создателя первым участником (`Order = 0`) в одной транзакции | REQ-FUNC-003 | GroupService | F-02 |
 | SYS-FUNC-004 | `GroupService` должен возвращать список групп пользователя с его балансом в каждой, разделяя активные и архивные группы | REQ-FUNC-004 | GroupService, BalanceCalculator | F-02 |
@@ -154,12 +144,13 @@ SDD служит руководством для разработчиков пр
 | SYS-FUNC-011 | `SettlementPlanner` должен строить список переводов жадным алгоритмом не более чем из N − 1 переводов | REQ-FUNC-015 | EvenUp.Core | F-07 |
 | SYS-FUNC-012 | `SettlementService` должен записывать и удалять погашения с проверкой прав (автор или создатель группы) и запретом совпадения отправителя и получателя | REQ-FUNC-016, REQ-FUNC-017 | SettlementService | F-08 |
 | SYS-FUNC-013 | `ExpenseService` должен разрешать изменение и удаление траты только её автору и создателю группы; изменение пересчитывает доли | REQ-FUNC-013, REQ-SEC-002 | ExpenseService, AccessGuard | F-09 |
-| SYS-FUNC-014 | `ExpenseService` должен возвращать детали траты с долями каждого участника | REQ-FUNC-019 | ExpenseService | F-10 |
+| SYS-FUNC-014 | `ExpenseService` должен возвращать детали траты с долями каждого участника (релиз 2.0) | REQ-FUNC-019 | ExpenseService | F-10 |
 | SYS-FUNC-015 | Каждая изменяющая операция сервисов должна добавлять ровно одну запись `HistoryEntry` в той же транзакции; для записей истории не предусмотрено методов изменения и удаления | REQ-FUNC-018 | Все сервисы, HistoryWriter | F-11 |
 | SYS-FUNC-016 | `MemberService` должен разрешать создателю мягкое удаление участника (`IsRemoved = true`) только при нулевом балансе; создателя удалить нельзя | REQ-FUNC-010 | MemberService | F-12 |
 | SYS-FUNC-017 | `GroupService` должен разрешать создателю переименовать группу и менять признак `IsArchived`; все изменяющие операции над архивной группой отклоняются | REQ-FUNC-005 | GroupService, AccessGuard | F-13 |
-| SYS-FUNC-018 | `MemberService` при вступлении должен позволять связать виртуального участника с аккаунтом (заполнить `UserId`) в одной транзакции, если он ещё не связан | REQ-FUNC-009, REQ-REL-001 | MemberService | F-14 |
-| SYS-FUNC-019 | `ExpenseService` должен фильтровать траты по участнику (плательщик или участник деления) запросом к БД | REQ-FUNC-020 | ExpenseService | F-15 |
+| SYS-FUNC-018 | `MemberService` при вступлении должен позволять связать виртуального участника с аккаунтом (заполнить `UserId`) в одной транзакции, если он ещё не связан (релиз 2.0) | REQ-FUNC-009, REQ-REL-001 | MemberService | F-14 |
+| SYS-FUNC-019 | `ExpenseService` должен фильтровать траты по участнику (плательщик или участник деления) запросом к БД (релиз 2.0) | REQ-FUNC-020 | ExpenseService | F-15 |
+| SYS-FUNC-020 | `ExpenseService` должен при включённом флажке «Повторять каждый месяц» сохранять шаблон регулярной траты, а `RecurringExpenseService` — при открытии группы создавать через `ExpenseService` траты за все наступившие и ещё не созданные месяцы; повторное создание за тот же месяц исключается уникальным ключом `(RecurringExpenseId, Period)` | REQ-FUNC-022, REQ-REL-001 | RecurringExpenseService, ExpenseService | F-16 |
 
 #### 3.1.2 Нефункциональные системные требования
 
@@ -172,10 +163,18 @@ SDD служит руководством для разработчиков пр
 | SYS-NFR-005 | Все денежные поля в коде должны иметь тип `decimal`, в SQLite храниться как `TEXT` через конвертер EF Core (без потери точности) | REQ-REL-002 | EvenUp.Core, EvenUp.Data |
 | SYS-NFR-006 | Приложение должно применять миграции EF Core при старте (`Database.Migrate()`), если файла БД нет — создавать его | REQ-INST-002, REQ-CM-004 | EvenUp.Web (Program.cs) |
 | SYS-NFR-007 | Логирование должно выполняться через `ILogger` с выводом в консоль и в файл с ротацией по дням и хранением 7 файлов; пароли, токены и email не логируются | REQ-OBS-001…003 | EvenUp.Web |
-| SYS-NFR-008 | Сборка `EvenUp.Core` не должна ссылаться на ASP.NET Core и EF Core; это проверяется архитектурным тестом | REQ-REUSE-001, REQ-MAINT-001 | EvenUp.Core, EvenUp.Core.Tests |
+| SYS-NFR-008 | Сборка `EvenUp.Core` не должна ссылаться на ASP.NET Core и EF Core; это проверяется архитектурным тестом | REQ-REUSE-001, REQ-MAINT-001 | EvenUp.Core |
 | SYS-NFR-009 | Компоненты Razor не должны получать `DbContext` через DI, только интерфейсы сервисов | REQ-MAINT-001 | EvenUp.Web |
 | SYS-NFR-010 | Интерфейс должен показывать компонент переподключения Blazor с текстом «Переподключение…» и временем ожидания 60 секунд | REQ-REL-004 | EvenUp.Web (App.razor) |
 | SYS-NFR-011 | Вёрстка должна строиться на CSS Grid/Flexbox с одной колонкой при ширине до 600 px | REQ-INT-001, REQ-PORT-002 | EvenUp.Web |
+| SYS-NFR-012 | 95% действий должны отвечать не дольше 1 секунды при заданной нагрузке; база с 100 группами и 1000 трат в каждой должна занимать не более 100 МБ | REQ-PERF-001, REQ-PERF-003 | EvenUp.Web, EvenUp.Data |
+| SYS-NFR-013 | Перезапуск не должен терять сохранённые данные; время старта — до 30 секунд, приложение готово к учебным демонстрациям | REQ-AVAIL-001, REQ-AVAIL-002 | EvenUp.Web, EvenUp.Data |
+| SYS-NFR-014 | Сервер работает на Windows, Linux и macOS; UI поддерживает браузеры из A-1 и ширину 360–1920 px без горизонтальной прокрутки | REQ-PORT-001, REQ-PORT-002, REQ-INT-001 | EvenUp.Web |
+| SYS-NFR-015 | Сборка и тесты запускаются командами `dotnet build` и `dotnet test`; версии пакетов фиксируются, README содержит запуск; расчётные алгоритмы покрыты тестами не менее чем на 80% строк | REQ-BUILD-002, REQ-BUILD-003, REQ-MAINT-002, REQ-MAINT-003 | Решение |
+| SYS-NFR-016 | Документация оформляется по СТП БГУИР; сторонние библиотеки имеют допустимые свободные лицензии; C# код следует соглашениям Microsoft; используются бесплатные инструменты | REQ-COMP-001, REQ-COMP-003, REQ-COMP-004, REQ-COST-001 | Репозиторий, решение |
+| SYS-NFR-017 | Приложение развёртывается одним серверным экземпляром с одной базой SQLite; масштабирование и репликация не требуются | REQ-DIST-001 | EvenUp.Web, EvenUp.Data |
+| SYS-NFR-018 | Для запуска нужен .NET 10 SDK; строка подключения задаёт путь к SQLite, секреты не хранятся в Git | REQ-INST-001, REQ-INST-003, REQ-INST-004 | EvenUp.Web |
+| SYS-NFR-019 | UI показывает суммы с валютой, ошибки у полей без потери ввода, понятные пустые состояния и подтверждение опасных действий; цвет баланса дублируется знаком | REQ-INT-002…006 | EvenUp.Web |
 
 ### 3.2 Приоритеты функционала {#32-feature-priorities}
 
@@ -187,86 +186,95 @@ SDD служит руководством для разработчиков пр
 - **40** — полезно: управление группой и удобства;
 - **50** — можно отложить.
 
-| ID | Feature | Описание | Требования SRS | Зависит от | Priority |
-|----|---------|----------|----------------|------------|:--------:|
-| F-00 | Project setup | Решение из 5 проектов, Identity, SQLite, миграции, логирование, CI-сборка | REQ-POC-001, REQ-INST-*, REQ-BUILD-*, REQ-OBS-* | — | 10 |
-| F-01 | User accounts | Регистрация, вход, выход, блокировка после неудачных попыток | REQ-FUNC-001, 002 | F-00 | 10 |
-| F-02 | Groups | Создание группы и список «Мои группы» с балансами | REQ-FUNC-003, 004 | F-01 | 10 |
-| F-03 | Expenses | Добавление траты с делением поровну | REQ-FUNC-011, 012 | F-02 | 10 |
-| F-04 | Balances | Расчёт и отображение балансов | REQ-FUNC-014 | F-03 | 10 |
-| F-05 | Virtual members | Участники без аккаунта | REQ-FUNC-008, 021 | F-02 | 20 |
-| F-06 | Invite links | Ссылка-приглашение и вступление по ней | REQ-FUNC-006, 007, 021 | F-02 | 20 |
-| F-07 | Settle-up plan | Минимальный список переводов | REQ-FUNC-015 | F-04 | 20 |
-| F-08 | Settlements | Запись и удаление погашений | REQ-FUNC-016, 017 | F-07 | 20 |
-| F-09 | Expense editing | Редактирование и удаление трат с проверкой прав, оптимистическая блокировка | REQ-FUNC-013, REQ-REL-003 | F-03 | 20 |
-| F-10 | Expense details | Детали траты с долями | REQ-FUNC-019 | F-03 | 30 |
-| F-11 | Activity history | Лента операций группы | REQ-FUNC-018 | F-03, F-08 | 30 |
-| F-12 | Member removal | Удаление участника с нулевым балансом | REQ-FUNC-010 | F-04 | 30 |
-| F-13 | Group archive | Переименование и архивирование группы | REQ-FUNC-005 | F-02 | 40 |
-| F-14 | Claim virtual member | Привязка виртуального участника к аккаунту при вступлении | REQ-FUNC-009 | F-05, F-06 | 40 |
-| F-15 | Expense filter | Фильтр трат по участнику | REQ-FUNC-020 | F-03 | 50 |
+Таблица отражает согласованное состояние (план v3). Приоритеты и релизы, изменённые по итогам обсуждения с Заказчиком, отмечены в колонке «Изменение».
 
-Зависимости функций:
+| ID | Feature | Описание | Требования SRS | Зависит от | Priority | Оценка, ч | Релиз | Изменение |
+|----|---------|----------|----------------|------------|:--------:|----------:|:-----:|-----------|
+| F-00 | Project setup | Настройка решения, Identity, SQLite, миграции, логирование, CI-сборка | REQ-POC-001, REQ-INST-*, REQ-BUILD-*, REQ-OBS-* | — | 10 | 6 | 1.0 | |
+| F-01 | User accounts | Регистрация, вход, выход, блокировка после неудачных попыток | REQ-FUNC-001, 002 | F-00 | 10 | 8 | 1.0 | |
+| F-02 | Groups | Создание группы и список «Мои группы» с балансами | REQ-FUNC-003, 004 | F-01 | 10 | 8 | 1.0 | |
+| F-03 | Expenses | Добавление траты с делением поровну | REQ-FUNC-011, 012 | F-02 | 10 | 12 | 1.0 | |
+| F-04 | Balances | Расчёт и отображение балансов | REQ-FUNC-014 | F-03 | 10 | 6 | 1.0 | |
+| F-05 | Virtual members | Участники без аккаунта | REQ-FUNC-008, 021 | F-02 | 20 | 4 | 1.0 | |
+| F-06 | Invite links | Ссылка-приглашение и вступление по ней | REQ-FUNC-006, 007, 021 | F-02 | 20 | 6 | 1.0 | |
+| F-07 | Settle-up plan | План переводов, закрывающий балансы, не более N − 1 переводов | REQ-FUNC-015 | F-04 | 20 | 6 | 1.0 | |
+| F-08 | Settlements | Запись и удаление погашений | REQ-FUNC-016, 017 | F-07 | 20 | 6 | 1.0 | |
+| F-09 | Expense editing | Редактирование и удаление трат с проверкой прав, оптимистическая блокировка | REQ-FUNC-013, REQ-REL-003 | F-03 | 20 | 8 | 1.0 | |
+| F-10 | Expense details | Детали траты с долями | REQ-FUNC-019 | F-03 | 30 | 3 | 2.0 | Раунд 2: 1.0 → 2.0 |
+| F-11 | Activity history | Лента операций группы | REQ-FUNC-018 | F-03, F-08 | 20 | 5 | 1.0 | Раунд 1: 30 → 20 |
+| F-12 | Member removal | Удаление участника с нулевым балансом | REQ-FUNC-010 | F-04 | 30 | 3 | 1.0 | |
+| F-13 | Group archive | Переименование и архивирование группы | REQ-FUNC-005 | F-02 | 40 | 3 | 1.0 | |
+| F-14 | Claim virtual member | Привязка виртуального участника к аккаунту при вступлении | REQ-FUNC-009 | F-05, F-06 | 50 | 5 | 2.0 | Раунд 1: 40 → 50; раунд 2: 1.0 → 2.0 |
+| F-15 | Expense filter | Фильтр трат по участнику | REQ-FUNC-020 | F-03 | 50 | 2 | 2.0 | Раунд 1: 1.0 → 2.0 |
+| F-16 | Recurring expenses | Шаблон траты, автоматическое создание за наступившие месяцы без дублей и возможность отключить повторение | REQ-FUNC-022 | F-03 | 30 | 14 | 1.0 | Раунд 2: полная реализация |
 
-```mermaid
-flowchart LR
-    F00[F-00 Project setup] --> F01[F-01 User accounts]
-    F01 --> F02[F-02 Groups]
-    F02 --> F03[F-03 Expenses]
-    F02 --> F05[F-05 Virtual members]
-    F02 --> F06[F-06 Invite links]
-    F02 --> F13[F-13 Group archive]
-    F03 --> F04[F-04 Balances]
-    F03 --> F09[F-09 Expense editing]
-    F03 --> F10[F-10 Expense details]
-    F03 --> F15[F-15 Expense filter]
-    F04 --> F07[F-07 Settle-up plan]
-    F04 --> F12[F-12 Member removal]
-    F07 --> F08[F-08 Settlements]
-    F08 --> F11[F-11 Activity history]
-    F05 --> F14[F-14 Claim virtual member]
-    F06 --> F14
-```
+Зависимости функций указаны в колонке «Зависит от» таблицы выше.
+
+#### 3.2.1 Оценки и план итераций {#321-estimates-and-iteration-plan}
+
+Условия планирования:
+
+- итерация длится 1 неделю; основной разработчик может уделять проекту около 12 ч в неделю, то есть за 9 итераций — 108 ч;
+- junior-разработчик участвует суммарно 12 ч, не более 6 ч в одной итерации; ему передаются ограниченные UI- и проверочные задачи;
+- оценки включают реализацию и проверки по требованиям SRS; интеграция, регрессия и подготовка демонстрации занимают 12 ч в итерации 9;
+- условная ставка основного разработчика — 10 BYN/ч, junior-разработчика — 6 BYN/ч; ставки используются только для учебного расчёта (REQ-COST-001);
+- стоимость согласованного плана рассчитывается как 95 × 10 + 12 × 6 = 1022 BYN.
+План обсуждался с Заказчиком в два раунда. Переписка приведена в отчёте по лабораторной работе №4.
+
+**План v1 — разработанный** (исходные приоритеты, F-00…F-15):
+
+| Итерация | Функции | Часы |
+|---------:|---------|-----:|
+| 1–2 | F-00, F-01, F-02 — настройка, аккаунты, группы | 22 |
+| 3 | F-03 — траты | 12 |
+| 4 | F-04, F-07 — балансы, план переводов | 12 |
+| 5 | F-06, F-08 — приглашения, погашения | 12 |
+| 6 | F-05, F-09 — виртуальные участники, редактирование трат | 12 |
+| 7 | F-10, F-11, F-12 — детали трат, история, удаление участника | 11 |
+| 8 | F-13, F-14, F-15 — архив, привязка участника, фильтр | 10 |
+| 9 | Интеграция, регрессия, демонстрация | 12 |
+| | **Итого: 91 ч функций + 12 ч интеграции = 103 ч; резерв 5 ч; 1030 BYN** | **103** |
+
+**План v2 — изменённый** после первого раунда: F-15 перенесена в 2.0, F-11 поднята до приоритета 20 и сдвинута на итерацию 6, F-14 понижена до приоритета 50.
+
+| Итерация | Функции | Часы |
+|---------:|---------|-----:|
+| 1–2 | F-00, F-01, F-02 | 22 |
+| 3 | F-03 | 12 |
+| 4 | F-04, F-07 | 12 |
+| 5 | F-06, F-08 | 12 |
+| 6 | F-05, F-10, F-11 — виртуальные участники, детали трат, история | 12 |
+| 7 | F-09, F-12 — редактирование трат, удаление участника | 11 |
+| 8 | F-13, F-14 — архив, привязка участника | 8 |
+| 9 | Интеграция, регрессия, демонстрация | 12 |
+| | **Итого: 89 ч функций + 12 ч интеграции = 101 ч; резерв 7 ч; 1010 BYN** | **101** |
+
+**План v3 — согласованный** после второго раунда: F-10, F-14 и F-15 перенесены в релиз 2.0, F-16 включена в полной оценке 14 ч. Если сохранить F-14 в релизе 1.0, объём достигает 112 ч и превышает доступные основному разработчику 108 ч. Исполнитель предложил передать junior-разработчику 12 ч UI- и проверочных задач; после переноса F-14 в релиз 2.0 согласованный объём составил 107 ч: 95 ч основного разработчика и 12 ч junior. Демонстрация остаётся в итерации 9.
+
+| Итерация | Функции и распределение работ | Основной разработчик, ч | Junior, ч | Всего, ч |
+|---------:|--------------------------------|------------------------:|----------:|---------:|
+| 1–2 | F-00, F-01, F-02 — настройка, аккаунты, группы | 22 | 0 | 22 |
+| 3 | F-03 — траты | 12 | 0 | 12 |
+| 4 | F-04, F-07 — балансы и план переводов | 12 | 0 | 12 |
+| 5 | F-06, F-08 — приглашения и погашения | 12 | 0 | 12 |
+| 6 | F-05, F-11, F-13 — основная логика; junior выполняет UI и проверки | 8 | 4 | 12 |
+| 7 | F-09, F-12; подготовка контракта F-16 — junior выполняет UI и проверки | 10 | 2 | 12 |
+| 8 | F-16 — основная логика и миграция; junior выполняет UI и проверки | 7 | 6 | 13 |
+| 9 | Интеграция, регрессия, демонстрация | 12 | 0 | 12 |
+| | **Итого** | **95** | **12** | **107** |
+Сравнение версий:
+
+| Версия | Объём, ч | Резерв, ч | Стоимость, BYN | Демонстрация |
+|--------|---------:|----------:|---------------:|--------------|
+| v1 — разработанный | 103 | 5 | 1030 | Итерация 9 |
+| v2 — изменённый | 101 | 7 | 1010 | Итерация 9 |
+| Полная F-16 и F-14 в релизе 1.0, с junior | 112 | 8 | 1072 | Итерация 9 |
+| **v3 — согласованный; F-14 в релизе 2.0** | **107** | **13** | **1022** | **Итерация 9** |
+Основной разработчик задействован на 95 из доступных 108 ч, поэтому его резерв составляет 13 ч; все 12 ч junior-ресурса запланированы. При отставании F-13 (приоритет 40) переносится в релиз 2.0, дата демонстрации не меняется.
 
 ### 3.3 Представления дизайна {#33-views}
 
-#### 001-context
-
-- **ID**: 001-context
-- **Title**: Границы системы и акторы
-- **Viewpoint**: Контекст
-- **Representation**:
-
-```mermaid
-flowchart LR
-    Guest([Гость])
-    Member([Участник группы])
-    Owner([Создатель группы])
-    Virtual([Виртуальный участник])
-    subgraph EvenUp
-        UC1(Регистрация и вход)
-        UC2(Создание группы, приглашение)
-        UC3(Вступление по ссылке)
-        UC4(Добавление трат)
-        UC5(Балансы и переводы)
-        UC6(Запись погашений)
-        UC7(Управление группой)
-    end
-    DB[(SQLite)]
-    Guest --> UC1
-    Guest --> UC3
-    Member --> UC2
-    Member --> UC4
-    Member --> UC5
-    Member --> UC6
-    Owner --> UC7
-    Owner -.наследует.-> Member
-    Virtual -.данные вводят другие.-> UC4
-    EvenUp --> DB
-```
-
-  Система не взаимодействует с внешними сервисами (ограничение C-4 SRS). Единственная внешняя зависимость во время работы — файл базы данных.
-- **More Information**: SRS, разделы 2.1 и 2.4; Приложение В SRS (UC-01…UC-07).
+Представления содержат сведения, необходимые для системных требований и плана реализации.
 
 #### 002-composition
 
@@ -279,18 +287,15 @@ flowchart LR
 flowchart TB
     subgraph Web[EvenUp.Web — ASP.NET Core, Blazor]
         UI[Components: страницы и формы]
-        Svc[Services: GroupService, MemberService,<br/>ExpenseService, SettlementService,<br/>HistoryWriter, AccessGuard]
+        Svc[Services: GroupService, MemberService,<br/>ExpenseService, SettlementService,<br/>RecurringExpenseService,<br/>HistoryWriter, AccessGuard]
         Id[Identity: аккаунты, cookie]
     end
     Data[EvenUp.Data — EF Core<br/>AppDbContext, сущности, миграции]
     Core[EvenUp.Core — чистая библиотека<br/>EqualSplitter, BalanceCalculator,<br/>SettlementPlanner]
-    Tests[EvenUp.Core.Tests, EvenUp.Web.Tests — xUnit]
     UI -->|использует интерфейсы| Svc
     Svc --> Data
     Svc --> Core
     Id --> Data
-    Tests --> Core
-    Tests --> Svc
 ```
 
   | Проект | Тип | Ответственность | Зависимости |
@@ -298,69 +303,9 @@ flowchart TB
   | EvenUp.Core | Class Library | Алгоритмы деления, балансов и переводов, доменные значения (`Money`, `Share`) | Нет (только BCL) |
   | EvenUp.Data | Class Library | `AppDbContext`, сущности, конфигурация, миграции | EF Core, EF Core SQLite, Identity EF Core |
   | EvenUp.Web | Blazor Web App | UI, сервисы бизнес-логики, Identity, DI, логирование | EvenUp.Core, EvenUp.Data |
-  | EvenUp.Core.Tests | xUnit | Модульные тесты алгоритмов, тест производительности, архитектурный тест | EvenUp.Core |
-  | EvenUp.Web.Tests | xUnit | Тесты сервисов на SQLite in-memory (права, транзакции, история) | EvenUp.Web |
 
   Направление зависимостей одно: UI → сервисы → данные и ядро. Ядро ни от чего не зависит (SYS-NFR-008).
 - **More Information**: ADR-0001, ADR-0002; SRS REQ-MAINT-001, REQ-REUSE-001.
-
-#### 003-logical
-
-- **ID**: 003-logical
-- **Title**: Основные классы
-- **Viewpoint**: Логическое представление
-- **Representation**:
-
-```mermaid
-classDiagram
-    class EqualSplitter {
-        +Split(decimal amount, IReadOnlyList~int~ memberIds) IReadOnlyList~Share~
-    }
-    class BalanceCalculator {
-        +Calculate(IEnumerable~ExpenseData~, IEnumerable~SettlementData~) IReadOnlyDictionary~int, decimal~
-    }
-    class SettlementPlanner {
-        +Plan(IReadOnlyDictionary~int, decimal~ balances) IReadOnlyList~Transfer~
-    }
-    class Share {
-        +int MemberId
-        +decimal Amount
-    }
-    class Transfer {
-        +int FromMemberId
-        +int ToMemberId
-        +decimal Amount
-    }
-    class IGroupService
-    class IMemberService
-    class IExpenseService
-    class ISettlementService
-    class AccessGuard {
-        +RequireMember(groupId, userId) Member
-        +RequireOwner(groupId, userId) Member
-        +RequireActive(group)
-    }
-    class HistoryWriter {
-        +Add(AppDbContext, groupId, type, authorId, text)
-    }
-    class Result~T~ {
-        +ResultStatus Status
-        +T Value
-        +string Error
-    }
-    EqualSplitter --> Share
-    SettlementPlanner --> Transfer
-    IExpenseService ..> EqualSplitter
-    IGroupService ..> BalanceCalculator
-    ISettlementService ..> SettlementPlanner
-    IExpenseService ..> AccessGuard
-    IExpenseService ..> HistoryWriter
-    IMemberService ..> AccessGuard
-    ISettlementService ..> AccessGuard
-```
-
-  Сервисы возвращают `Result<T>` со статусом `Ok`, `NotFound`, `Forbidden`, `Invalid` или `Conflict`, а не бросают исключения на ожидаемые ошибки. Страница показывает сообщение по статусу (REQ-INT-003).
-- **More Information**: 005-interfaces, 007-algorithms.
 
 #### 004-information
 
@@ -381,6 +326,8 @@ erDiagram
     Expenses ||--|{ ExpenseShares : "делится на"
     Members ||--o{ ExpenseShares : "имеет долю"
     Members ||--o{ Settlements : "отправляет / получает"
+    Groups ||--o{ RecurringExpenses : "содержит"
+    RecurringExpenses ||--o{ Expenses : "порождает"
 
     AspNetUsers {
         string Id PK
@@ -414,6 +361,20 @@ erDiagram
         int PayerMemberId FK
         string AuthorUserId FK
         int Version "токен параллелизма"
+        int RecurringExpenseId FK "null у обычной траты"
+        string Period "yyyy-MM, null у обычной траты"
+    }
+    RecurringExpenses {
+        int Id PK
+        int GroupId FK
+        string Description
+        decimal Amount
+        int PayerMemberId FK
+        string ParticipantIds "участники деления"
+        int DayOfMonth "1–28"
+        date StartDate
+        bool IsStopped
+        string AuthorUserId FK
     }
     ExpenseShares {
         int ExpenseId PK
@@ -450,124 +411,11 @@ erDiagram
   | ExpenseShares | `PK(ExpenseId, MemberId)`, каскадное удаление с тратой | Доли удаляются вместе с тратой |
   | Settlements | `CHECK(FromMemberId <> ToMemberId)` | REQ-FUNC-016 |
   | HistoryEntries | `INDEX(GroupId, CreatedAt DESC)` | Лента истории |
+  | Expenses | `UNIQUE(RecurringExpenseId, Period) WHERE RecurringExpenseId IS NOT NULL` | Не больше одной траты за месяц по шаблону (REQ-FUNC-022) |
+  | RecurringExpenses | `CHECK(DayOfMonth BETWEEN 1 AND 28)` | День есть в любом месяце |
 
   Удаление участников мягкое (`IsRemoved`), чтобы траты в истории сохраняли ссылки на участника (REQ-FUNC-010). Балансы не хранятся, а вычисляются (ADR-0005). Денежные поля хранятся как `TEXT` через конвертер `decimal ↔ string` (SYS-NFR-005).
 - **More Information**: SRS, Приложение А; ADR-0004, ADR-0005.
-
-#### 005-interfaces
-
-- **ID**: 005-interfaces
-- **Title**: Интерфейсы сервисов
-- **Viewpoint**: Интерфейс
-- **Representation**:
-
-```csharp
-public interface IGroupService
-{
-    Task<Result<int>> CreateAsync(string userId, string name, string currency);
-    Task<IReadOnlyList<GroupSummaryDto>> GetMyGroupsAsync(string userId);   // с балансом пользователя
-    Task<Result<GroupDto>> GetAsync(string userId, int groupId);
-    Task<Result> RenameAsync(string userId, int groupId, string newName);   // только создатель
-    Task<Result> SetArchivedAsync(string userId, int groupId, bool archived);
-    Task<Result<string>> RegenerateInviteAsync(string userId, int groupId);
-    Task<Result<BalancesDto>> GetBalancesAsync(string userId, int groupId); // балансы + переводы
-}
-
-public interface IMemberService
-{
-    Task<Result<IReadOnlyList<MemberDto>>> GetAsync(string userId, int groupId);
-    Task<Result<int>> AddVirtualAsync(string userId, int groupId, string name);
-    Task<Result<JoinInfoDto>> GetJoinInfoAsync(string token);               // группа и свободные виртуальные
-    Task<Result<int>> JoinAsync(string userId, string token, int? claimVirtualMemberId);
-    Task<Result> RemoveAsync(string userId, int groupId, int memberId);     // только при балансе 0
-}
-
-public interface IExpenseService
-{
-    Task<Result<IReadOnlyList<ExpenseListItemDto>>> GetListAsync(string userId, int groupId, int? filterMemberId);
-    Task<Result<ExpenseDetailsDto>> GetDetailsAsync(string userId, int expenseId);
-    Task<Result<int>> AddAsync(string userId, ExpenseInput input);
-    Task<Result> UpdateAsync(string userId, int expenseId, ExpenseInput input, int expectedVersion);
-    Task<Result> DeleteAsync(string userId, int expenseId);
-}
-
-public interface ISettlementService
-{
-    Task<Result<int>> AddAsync(string userId, int groupId, int fromMemberId, int toMemberId, decimal amount);
-    Task<Result> DeleteAsync(string userId, int settlementId);
-}
-
-public interface IHistoryService
-{
-    Task<Result<IReadOnlyList<HistoryEntryDto>>> GetAsync(string userId, int groupId, int skip, int take);
-}
-```
-
-  Контракты, общие для всех методов:
-  - `userId` берётся из `AuthenticationState` на сервере, а не из параметров страницы;
-  - если пользователь не участник группы, возвращается `NotFound` (REQ-SEC-002);
-  - изменяющие методы для архивной группы возвращают `Invalid` с текстом «Группа в архиве»;
-  - суммы проверяются на диапазон 0,01…100 000,00 до обращения к БД.
-
-  Страницы и маршруты соответствуют мокапам SRS: `/login`, `/register`, `/groups`, `/groups/{id}/expenses`, `/groups/{id}/expenses/new`, `/groups/{id}/expenses/{expenseId}`, `/groups/{id}/balances`, `/groups/{id}/members`, `/groups/{id}/history`, `/join/{token}`.
-- **More Information**: SRS 3.1.1 (UI-01…UI-08), 003-logical.
-
-#### 006-interactions
-
-- **ID**: 006-interactions
-- **Title**: Добавление траты и вступление в группу
-- **Viewpoint**: Взаимодействие
-- **Representation**:
-
-  Добавление траты (основной сценарий и отказ по правам):
-
-```mermaid
-sequenceDiagram
-    actor U as Участник
-    participant P as ExpenseForm.razor
-    participant S as ExpenseService
-    participant G as AccessGuard
-    participant C as EqualSplitter
-    participant D as AppDbContext (SQLite)
-    U->>P: Заполняет форму, «Сохранить»
-    P->>S: AddAsync(userId, input)
-    S->>D: CreateDbContext()
-    S->>G: RequireMember(groupId, userId)
-    alt не участник
-        G-->>S: NotFound
-        S-->>P: Result.NotFound
-        P-->>U: «Группа не найдена»
-    else участник, группа активна
-        S->>C: Split(amount, memberIds)
-        C-->>S: доли (сумма = amount)
-        S->>D: BEGIN; INSERT Expense, ExpenseShares, HistoryEntry; COMMIT
-        S-->>P: Result.Ok(expenseId)
-        P-->>U: Переход к списку трат, балансы обновлены
-    end
-```
-
-  Вступление по ссылке с привязкой виртуального участника:
-
-```mermaid
-sequenceDiagram
-    actor U as Пользователь
-    participant J as Join.razor
-    participant M as MemberService
-    participant D as AppDbContext
-    U->>J: Открывает /join/{token}
-    alt гость
-        J-->>U: Редирект на /login?returnUrl=/join/{token}
-        U->>J: Вход, возврат на /join/{token}
-    end
-    J->>M: GetJoinInfoAsync(token)
-    M-->>J: Группа, список несвязанных виртуальных участников
-    U->>J: Выбирает «Я — Вика», «Вступить»
-    J->>M: JoinAsync(userId, token, claimId)
-    M->>D: BEGIN; UPDATE Members SET UserId; INSERT HistoryEntry; COMMIT
-    M-->>J: Result.Ok(groupId)
-    J-->>U: Переход в группу
-```
-- **More Information**: SYS-FUNC-005, SYS-FUNC-010, SYS-FUNC-018; SRS UI-04, UI-08.
 
 #### 007-algorithms
 
@@ -621,135 +469,13 @@ creditors = участники с balance > 0, по убыванию
   Для примера из Приложения Б SRS: балансы Аня +50, Борис −10, Вика −40 → Вика → Аня 40,00; Борис → Аня 10,00.
 - **More Information**: ADR-0006; SRS REQ-FUNC-012, 014, 015, REQ-POC-002.
 
-#### 008-states
-
-- **ID**: 008-states
-- **Title**: Состояния группы и участника
-- **Viewpoint**: Динамика состояний
-- **Representation**:
-
-```mermaid
-stateDiagram-v2
-    direction LR
-    state "Группа" as G {
-        [*] --> Active : создание
-        Active --> Archived : архивировать (создатель)
-        Archived --> Active : вернуть из архива (создатель)
-    }
-```
-
-```mermaid
-stateDiagram-v2
-    direction LR
-    [*] --> Virtual : добавлен по имени
-    [*] --> Linked : вступил по ссылке
-    Virtual --> Linked : «Это я» при вступлении
-    Virtual --> Removed : удалён (баланс = 0)
-    Linked --> Removed : удалён (баланс = 0, не создатель)
-    Removed --> [*]
-```
-
-  | Состояние группы | Разрешено |
-  |------------------|-----------|
-  | Active | Все операции согласно правам |
-  | Archived | Только чтение; изменить можно только признак архива |
-
-  Состояние участника задаётся полями: `Virtual` — `UserId = null`, `Linked` — `UserId` заполнен, `Removed` — `IsRemoved = true`.
-- **More Information**: SRS REQ-FUNC-005, 009, 010; диаграмма навигации SRS (ui-00-navigation).
-
-#### 009-concurrency
-
-- **ID**: 009-concurrency
-- **Title**: Параллельная работа пользователей
-- **Viewpoint**: Параллелизм
-- **Representation**:
-
-  В Blazor Interactive Server у каждой вкладки браузера свой circuit на сервере, события одного circuit обрабатываются последовательно, разные circuit работают параллельно.
-
-  | Ситуация | Решение |
-  |----------|---------|
-  | Долгоживущий circuit и `DbContext` (контекст не потокобезопасен и разрастается) | `IDbContextFactory<AppDbContext>`: новый контекст на каждую операцию сервиса (SYS-NFR-001) |
-  | Два пользователя редактируют одну трату | Поле `Version` как токен параллелизма; при `DbUpdateConcurrencyException` — `Result.Conflict` и перезагрузка формы с актуальными данными (REQ-REL-003) |
-  | Два пользователя одновременно вступают в группу на 30-м месте | Проверка лимита и вставка в одной транзакции; SQLite выполняет записи последовательно, второй получает ошибку лимита |
-  | Одновременные записи в SQLite | Режим журнала WAL: чтение не блокируется записью; запись сериализуется самой СУБД |
-  | Другой участник добавил трату, пока я смотрю балансы | В релизе 1.0 данные обновляются при переходе между вкладками группы; живое обновление не требуется SRS |
-- **More Information**: ADR-0001, ADR-0002.
-
-#### 010-patterns
-
-- **ID**: 010-patterns
-- **Title**: Применённые паттерны
-- **Viewpoint**: Паттерны
-- **Representation**:
-
-  | Паттерн | Где | Зачем |
-  |---------|-----|-------|
-  | Слоистая архитектура | UI → Services → Data/Core | REQ-MAINT-001 |
-  | Service Layer | `*Service` в EvenUp.Web | Вся бизнес-логика и проверки прав в одном месте |
-  | Unit of Work | `AppDbContext` + `SaveChanges` в одной транзакции | REQ-REL-001 |
-  | Dependency Injection | Регистрация сервисов в `Program.cs` | Подмена реализаций в тестах |
-  | Result Object | `Result<T>` | Ожидаемые ошибки без исключений |
-  | Strategy (на будущее) | `EqualSplitter` за интерфейсом `ISplitter` | Деление по долям в релизе 2.0 добавляется новой реализацией |
-  | Optimistic Concurrency | `Expense.Version` | REQ-REL-003 |
-  | Soft Delete | `Member.IsRemoved` | REQ-FUNC-010 |
-
-  Отдельный слой репозиториев не вводится: `DbContext` уже реализует Repository и Unit of Work, а лишняя обёртка только усложнит код.
-- **More Information**: 002-composition, 003-logical.
-
-#### 011-deployment
-
-- **ID**: 011-deployment
-- **Title**: Развёртывание
-- **Viewpoint**: Развёртывание (совмещено с физическим представлением)
-- **Representation**:
-
-```mermaid
-flowchart LR
-    subgraph Client[Устройство пользователя]
-        B[Браузер<br/>blazor.web.js]
-    end
-    subgraph Server[ПК / сервер: Windows, Linux или macOS]
-        K[Kestrel, .NET 10<br/>EvenUp.Web]
-        F[(evenup.db<br/>SQLite, WAL)]
-        L[logs/evenup-ГГГГММДД.log]
-    end
-    B <-->|HTTPS + WebSocket SignalR| K
-    K --> F
-    K --> L
-```
-
-  - Запуск: `dotnet run --project src/EvenUp.Web` (REQ-INST-001), миграции применяются при старте.
-  - Конфигурация: строка подключения и уровень логов в `appsettings.json`, локальные переопределения — в `appsettings.Development.json` (не коммитится).
-  - Окружения: Development (ПК разработчика) и Demo (тот же ПК, доступ с телефона по локальной сети, REQ-POC-001).
-  - CI: GitHub Actions на каждый pull request выполняет `dotnet build` и `dotnet test` (REQ-BUILD-002, 003).
-- **More Information**: ADR-0002; SRS 3.5.1–3.5.3.
-
-#### 012-resources
-
-- **ID**: 012-resources
-- **Title**: Оценка ресурсов
-- **Viewpoint**: Ресурсы
-- **Representation**:
-
-  | Ресурс | Оценка | Основание |
-  |--------|--------|-----------|
-  | Память на один circuit | ~0,5 МБ | Небольшие страницы, данные только текущей группы |
-  | Память сервера при 20 пользователях | < 300 МБ | 20 circuit + базовое потребление ASP.NET Core |
-  | Размер одной траты в БД | ~0,5 КБ с долями | 1 строка Expenses + до 30 строк ExpenseShares |
-  | БД на 100 групп × 1000 трат | ~50 МБ | Укладывается в REQ-PERF-003 (100 МБ) |
-  | Соединения SignalR | 1 WebSocket на вкладку | Ограничение A-3 SRS: до 20 пользователей |
-  | Время расчёта балансов | < 10 мс | O(E + S), см. 007-algorithms |
-- **More Information**: SRS REQ-PERF-001…003, A-3.
-
----
-
 ## 4. Решения {#4-decisions}
 
 Каждое решение оформлено отдельным файлом по шаблону ADR в каталоге [`adr/`](adr/).
 
 | ID | Title | Context | Options | Outcome | More Information |
 |----|-------|---------|---------|---------|------------------|
-| 0001-blazor-server | Интерфейс на Blazor Interactive Server | Нужен интерактивный веб-UI на C# одним разработчиком | Blazor Server; Blazor WebAssembly + Web API; ASP.NET Core MVC + JS | «Blazor Server», потому что не нужен отдельный API, весь код на C# и данные не уходят в браузер | [ADR-0001](adr/0001-blazor-server.md) |
+| 0001-blazor-server | Интерфейс на Blazor Interactive Server | Нужен интерактивный веб-UI на C# для небольшого учебного проекта с ограниченным составом исполнителей | Blazor Server; Blazor WebAssembly + Web API; ASP.NET Core MVC + JS | «Blazor Server», потому что не нужен отдельный API, весь код на C# и данные не уходят в браузер | [ADR-0001](adr/0001-blazor-server.md) |
 | 0002-sqlite | Хранение данных в SQLite через EF Core | Нужна БД без установки и платы | SQLite; PostgreSQL; SQL Server LocalDB | «SQLite», потому что это один файл, работает на всех ОС и хватает для 20 пользователей | [ADR-0002](adr/0002-sqlite.md) |
 | 0003-identity | Аутентификация через ASP.NET Core Identity | Нужны регистрация, хэши паролей, блокировка | Identity; своя реализация; внешний OAuth | «Identity», потому что всё требуемое есть из коробки | [ADR-0003](adr/0003-identity.md) |
 | 0004-member-entity | Единая сущность Member для обычных и виртуальных участников | Виртуальные участники должны участвовать в тратах наравне с пользователями | Member с nullable UserId; отдельные таблицы; псевдо-аккаунты | «Member с nullable UserId», потому что привязка — это заполнение одного поля | [ADR-0004](adr/0004-member-entity.md) |
@@ -764,36 +490,39 @@ flowchart LR
 
 | Требование SRS | Системные требования | Представления | ADR |
 |----------------|---------------------|---------------|-----|
-| REQ-FUNC-001, 002 | SYS-FUNC-001, 002 | 002, 011 | 0003 |
-| REQ-FUNC-003, 004 | SYS-FUNC-003, 004 | 004, 005 | 0005 |
-| REQ-FUNC-005 | SYS-FUNC-017 | 008 | — |
-| REQ-FUNC-006, 007 | SYS-FUNC-009, 010 | 005, 006 | — |
-| REQ-FUNC-008, 009 | SYS-FUNC-008, 018 | 004, 006, 008 | 0004 |
-| REQ-FUNC-010 | SYS-FUNC-016 | 004, 008 | 0004 |
-| REQ-FUNC-011, 012 | SYS-FUNC-005, 006 | 006, 007 | — |
-| REQ-FUNC-013 | SYS-FUNC-013, SYS-NFR-004 | 009 | — |
+| REQ-FUNC-001, 002 | SYS-FUNC-001, 002 | 002 | 0003 |
+| REQ-FUNC-003, 004 | SYS-FUNC-003, 004 | 002, 004, 007 | 0005 |
+| REQ-FUNC-005 | SYS-FUNC-017 | 002 | — |
+| REQ-FUNC-006, 007 | SYS-FUNC-009, 010 | 002, 004 | — |
+| REQ-FUNC-008, 009 | SYS-FUNC-008, 018 | 004 | 0004 |
+| REQ-FUNC-010 | SYS-FUNC-016 | 004 | 0004 |
+| REQ-FUNC-011, 012 | SYS-FUNC-005, 006 | 004, 007 | — |
+| REQ-FUNC-013 | SYS-FUNC-013, SYS-NFR-004 | 004 | — |
 | REQ-FUNC-014 | SYS-FUNC-007 | 007 | 0005 |
 | REQ-FUNC-015 | SYS-FUNC-011 | 007 | 0006 |
-| REQ-FUNC-016, 017 | SYS-FUNC-012 | 005 | — |
+| REQ-FUNC-016, 017 | SYS-FUNC-012 | 002, 004 | — |
 | REQ-FUNC-018 | SYS-FUNC-015 | 004 | — |
-| REQ-FUNC-019, 020 | SYS-FUNC-014, 019 | 005 | — |
-| REQ-FUNC-021 | SYS-FUNC-008, 010 | 009 | — |
-| REQ-PERF-001…003 | SYS-NFR-001, 002 | 012 | 0002, 0005 |
-| REQ-SEC-001…007 | SYS-FUNC-001, 002, 009, SYS-NFR-003, 007 | 005 | 0003 |
-| REQ-REL-001…004 | SYS-FUNC-005, 018, SYS-NFR-004, 005, 010 | 009 | 0001 |
-| REQ-MAINT-001, REQ-REUSE-001 | SYS-NFR-008, 009 | 002, 010 | — |
-| REQ-INST-*, REQ-BUILD-* | SYS-NFR-006 | 011 | 0002 |
-
-### Приложение Б. Структура репозитория с кодом
-
-```text
-src/
-  EvenUp.Core/          EqualSplitter.cs, BalanceCalculator.cs, SettlementPlanner.cs
-  EvenUp.Data/          AppDbContext.cs, Entities/, Migrations/
-  EvenUp.Web/           Program.cs, Components/Pages/, Services/, appsettings.json
-tests/
-  EvenUp.Core.Tests/    SplitTests.cs, BalanceTests.cs, SettlementTests.cs, PerformanceTests.cs
-  EvenUp.Web.Tests/     ExpenseServiceTests.cs, MemberServiceTests.cs, ...
-EvenUp.sln
-README.md
-```
+| REQ-FUNC-019 | SYS-FUNC-014 | 004 | — |
+| REQ-FUNC-020 | SYS-FUNC-019 | 004 | — |
+| REQ-FUNC-021 | SYS-FUNC-008, 010 | 002, 004 | — |
+| REQ-FUNC-022 | SYS-FUNC-020 | 002, 004 | — |
+| REQ-INT-001…006 | SYS-NFR-011, 014, 019 | 002 | — |
+| REQ-PERF-001 | SYS-NFR-001, 012 | 002, 004 | 0002 |
+| REQ-PERF-002 | SYS-NFR-002 | 007 | 0005 |
+| REQ-PERF-003 | SYS-NFR-012 | 004 | 0002 |
+| REQ-SEC-001…007 | SYS-FUNC-001, 002, 009, SYS-NFR-003, 007 | 002, 004 | 0003 |
+| REQ-REL-001…004 | SYS-FUNC-005, 018, 020, SYS-NFR-004, 005, 010 | 002, 004 | 0001 |
+| REQ-AVAIL-001…002 | SYS-NFR-013 | 002 | 0002 |
+| REQ-OBS-001…003 | SYS-NFR-007 | 002 | — |
+| REQ-COMP-001…004 | SYS-FUNC-001, SYS-NFR-016 | 002 | 0003 |
+| REQ-PORT-001…002 | SYS-NFR-014 | 002 | — |
+| REQ-COST-001 | SYS-NFR-016 | 002 | — |
+| REQ-DIST-001 | SYS-NFR-017 | 002 | 0002 |
+| REQ-MAINT-001…003, REQ-REUSE-001 | SYS-NFR-008, 009, 015 | 002 | — |
+| REQ-INST-001…004 | SYS-NFR-006, 018 | 002 | 0002 |
+| REQ-BUILD-001 | Процесс: Git, ветка и pull request | 1.5, история изменений | — |
+| REQ-BUILD-002…003 | SYS-NFR-015 | 002 | — |
+| REQ-DEAD-001 | План итераций v3 (3.2.1); приёмка по итерациям | 3.2.1 | — |
+| REQ-POC-001…002 | F-00; представления 002, 007 | 002, 007 | 0001, 0002, 0003 |
+| REQ-CM-001…003 | Процесс Git/pull request и история версий | 1.5, история изменений | — |
+| REQ-CM-004 | SYS-NFR-006 | 002, 004 | 0002 |
