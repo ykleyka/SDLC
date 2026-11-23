@@ -1,0 +1,49 @@
+@startuml seq-01-add-expense
+!include style.iuml
+title Диаграмма последовательности: добавление траты (UC-08)
+autonumber
+
+actor "Участник" as U
+participant "ExpenseForm\n.razor" as P
+participant "ExpenseService" as S
+participant "AccessGuard" as G
+participant "EqualSplitter" as C
+database "SQLite" as DB
+
+U -> P : «Сохранить»
+activate P
+P -> S : AddAsync(userId, input)
+activate S
+create participant "AppDbContext" as D
+S -> D : <<create>> CreateDbContext()
+S -> G : RequireMember(groupId, userId)
+activate G
+G -> D : найти участника
+D -> DB : SELECT
+G --> S : участник
+deactivate G
+
+alt не участник или группа в архиве
+  S --> P : Result.NotFound / Invalid
+  P --> U : сообщение об ошибке
+else участник, группа активна
+  S -> C : Split(amount, memberIds)
+  activate C
+  C --> S : доли
+  deactivate C
+  S -> D : Add(expense, shares, history)
+  S -> D : SaveChanges()
+  D -> DB : BEGIN; INSERT ...; COMMIT
+  opt повторение включено
+    S -> D : Add(recurringTemplate)
+    S -> D : SaveChanges()
+    D -> DB : INSERT recurring template; COMMIT
+  end
+  S --> P : Result.Ok(expenseId)
+  P ->> U : обновлённый список трат (SignalR)
+end
+S -> D !! : Dispose()
+deactivate S
+deactivate P
+note right of U : весь сценарий — не более 1 с\n(REQ-PERF-001)
+@enduml

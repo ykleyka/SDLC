@@ -65,4 +65,4 @@ informed: преподаватель
 
 ## Дополнительная информация
 
-Связано с REQ-FUNC-007…010 SRS и SDD 004-information, 008-states.
+Связано с REQ-FUNC-007…010 SRS и SDD 004-information, 3.3 «Поведенческая модель UML».

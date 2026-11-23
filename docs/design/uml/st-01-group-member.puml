@@ -1,0 +1,30 @@
+@startuml st-01-group-member
+!include style.iuml
+title Диаграммы состояний: группа и участник
+
+state "Группа" as Group {
+  [*] --> Active : создание
+  state "Активна" as Active {
+    [*] --> Empty
+    state "Без трат" as Empty
+    state "С тратами" as WithExpenses
+    Empty --> WithExpenses : добавлена первая трата\n/ валюта фиксируется
+    WithExpenses --> Empty : удалена последняя трата
+  }
+  state "В архиве" as Archived
+  Archived : entry / изменения запрещены
+  Active --> Archived : в архив [создатель]
+  Archived --> Active : вернуть из архива [создатель]
+}
+
+state "Участник" as Member {
+  [*] --> Virtual : добавлен по имени
+  [*] --> Linked : вступил по ссылке
+  state "Виртуальный" as Virtual
+  state "С аккаунтом" as Linked
+  state "Удалён" as Removed
+  Virtual --> Removed : удалить [баланс = 0]
+  Linked --> Removed : удалить [баланс = 0\nи не создатель]
+  Removed --> [*]
+}
+@enduml

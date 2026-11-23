@@ -1,0 +1,21 @@
+' Общий стиль диаграмм EvenUp
+skinparam defaultFontName Arial
+skinparam defaultFontSize 13
+skinparam shadowing false
+skinparam monochrome false
+skinparam backgroundColor white
+skinparam ArrowColor #333333
+skinparam ActorBorderColor #333333
+skinparam UsecaseBorderColor #333333
+skinparam UsecaseBackgroundColor #F5F8FC
+skinparam RectangleBorderColor #333333
+skinparam ActivityBorderColor #333333
+skinparam ActivityBackgroundColor #F5F8FC
+skinparam StateBorderColor #333333
+skinparam StateBackgroundColor #F5F8FC
+skinparam ParticipantBorderColor #333333
+skinparam ParticipantBackgroundColor #F5F8FC
+skinparam SequenceLifeLineBorderColor #777777
+skinparam NoteBackgroundColor #FFFBE6
+skinparam NoteBorderColor #999999
+skinparam TitleFontSize 15

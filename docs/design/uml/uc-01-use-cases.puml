@@ -1,0 +1,44 @@
+@startuml uc-01-use-cases
+!include style.iuml
+title Диаграмма прецедентов «EvenUp», релиз 1.0
+left to right direction
+
+actor "Гость" as Guest
+actor "Пользователь" as User
+actor "Участник группы" as Member
+actor "Создатель группы" as Owner
+
+User <|-- Member
+Member <|-- Owner
+
+rectangle "EvenUp" {
+  usecase "UC-01\nЗарегистрироваться" as UC01
+  usecase "UC-02\nВойти в систему" as UC02
+  usecase "UC-03\nСоздать группу" as UC03
+  usecase "UC-04\nВступить в группу\nпо ссылке" as UC04
+  usecase "UC-05\nОткрыть группу" as UC05
+  usecase "UC-06\nСоздать регулярные\nтраты за месяц" as UC06
+  usecase "UC-07\nДобавить участника" as UC07
+  usecase "UC-08\nДобавить трату" as UC08
+  usecase "UC-09\nИзменить или\nудалить трату" as UC09
+  usecase "UC-10\nПросмотреть балансы" as UC10
+  usecase "UC-11\nЗаписать или удалить\nпогашение" as UC11
+  usecase "UC-12\nУправлять группой" as UC12
+}
+
+Guest --> UC01
+Guest --> UC02
+User --> UC03
+User --> UC04
+Member --> UC05
+Member --> UC07
+Member --> UC08
+Member --> UC09
+Member --> UC10
+Owner --> UC12
+
+UC05 <.. UC06 : <<extend>>\n[активная группа, наступил период]
+UC10 <.. UC11 : <<extend>>
+UC04 <.. UC01 : <<extend>>
+UC04 <.. UC02 : <<extend>>
+@enduml
