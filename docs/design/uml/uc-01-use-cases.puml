@@ -8,14 +8,19 @@ actor "Пользователь" as User
 actor "Участник группы" as Member
 actor "Создатель группы" as Owner
 
-User <|-- Member
-Member <|-- Owner
+'Подсказки по компоновке (на смысл диаграммы не влияют).
+'При "left to right direction" up/down сдвигают элемент вправо/влево,
+'а left/right выстраивают элементы в одну вертикальную колонку.
+'Все актёры в одной колонке слева: Гость, Пользователь, Участник, Создатель.
+Guest -[hidden]right- User
+User <|-right- Member
+Member <|-right- Owner
 
 rectangle "EvenUp" {
   usecase "UC-01\nЗарегистрироваться" as UC01
+  usecase "UC-04\nВступить в группу\nпо ссылке" as UC04
   usecase "UC-02\nВойти в систему" as UC02
   usecase "UC-03\nСоздать группу" as UC03
-  usecase "UC-04\nВступить в группу\nпо ссылке" as UC04
   usecase "UC-05\nОткрыть группу" as UC05
   usecase "UC-06\nСоздать регулярные\nтраты за месяц" as UC06
   usecase "UC-07\nДобавить участника" as UC07
@@ -35,10 +40,22 @@ Member --> UC07
 Member --> UC08
 Member --> UC09
 Member --> UC10
+Member --> UC11
 Owner --> UC12
 
-UC05 <.. UC06 : <<extend>>\n[активная группа, наступил период]
-UC10 <.. UC11 : <<extend>>
+'UC-01 и UC-02 расширяют UC-04 и стоят справа от него, как UC-06 и UC-11
 UC04 <.. UC01 : <<extend>>
 UC04 <.. UC02 : <<extend>>
+'Подсказка: UC-01 над UC-02 в правой колонке
+UC01 -[hidden]right- UC02
+UC05 <.. UC06 : <<extend>>\n[активная группа, наступил период]
+UC10 <.. UC11 : <<extend>>
+
+'Условия расширения UC-04 вынесены в примечание
+note as N4
+  Условия расширения UC-04:
+  UC-01 — гость не зарегистрирован,
+  UC-02 — гость не вошёл
+end note
+UC04 .. N4
 @enduml

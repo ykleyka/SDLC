@@ -8,23 +8,29 @@ state "Группа" as Group {
     [*] --> Empty
     state "Без трат" as Empty
     state "С тратами" as WithExpenses
-    Empty --> WithExpenses : добавлена первая трата\n/ валюта фиксируется
+    Empty --> WithExpenses : добавлена первая трата
     WithExpenses --> Empty : удалена последняя трата
   }
   state "В архиве" as Archived
-  Archived : entry / изменения запрещены
+  Archived : только просмотр: траты, погашения\nи участники не меняются
   Active --> Archived : в архив [создатель]
-  Archived --> Active : вернуть из архива [создатель]
+  Archived --> Active[H] : вернуть из архива [создатель]
 }
+note bottom of Group
+  Валюта группы не меняется после добавления
+  первой траты (REQ-FUNC-003).
+end note
 
 state "Участник" as Member {
-  [*] --> Virtual : добавлен по имени
-  [*] --> Linked : вступил по ссылке
+  state start <<choice>>
+  [*] --> start
+  start --> Virtual : [добавлен по имени]
+  start --> Linked : [создал группу или\nвступил по ссылке]
   state "Виртуальный" as Virtual
   state "С аккаунтом" as Linked
   state "Удалён" as Removed
-  Virtual --> Removed : удалить [баланс = 0]
-  Linked --> Removed : удалить [баланс = 0\nи не создатель]
+  Virtual --> Removed : удалить [создатель,\nбаланс = 0]
+  Linked --> Removed : удалить [создатель, баланс = 0,\nудаляемый не создатель]
   Removed --> [*]
 }
 @enduml
